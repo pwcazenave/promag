@@ -7,19 +7,22 @@ services:
     hostname: redis
     restart: unless-stopped
     networks:
-      - promag-network
+      promag-network:
 
   promag:
-    image: localhost:5000/promag:latest
+    image: registry.upended.duckdns.org/promag:latest
     container_name: promag
     hostname: promag
     restart: unless-stopped
     ports:
-      - 8080:8080
+      - 9000:9000
     depends_on:
       - promag-redis
     networks:
-      - promag-network
+      promag-network:
+    environment:
+      REDIS_HOST: redis
+
 networks:
   promag-network:
 
