@@ -10,14 +10,14 @@ podman build -t localhost/promag:latest -f Containerfile
 This will set up redis and promag servers
 
 ```
-podman compose -f compose.yml
+podman-compose -f compose.yml up -d
 ```
 
 ## Standalone
 
 ```
-podman run -dt library.docker.io/redis:latest --name redis
-podman run -dt localhost/promag:latest --name promag
+podman run -dt docker.io/library/redis:latest --name redis
+podman run -dt localhost/promag:latest --port 9000:9000 --name promag
 ```
 
 ## Environment variables for promag
@@ -28,3 +28,22 @@ podman run -dt localhost/promag:latest --name promag
 - `PROM_HOST`: defaults to `""`
 - `PROM_PORT`: defaults to `9000`
 
+# Prometheus
+Configure your prometheus server to scrape the metrics as below:
+
+```yaml
+scrape_configs:
+  - job_name: 'airgradient'
+    metrics_path: /probe?target=airgradientid
+    scrape_interval: 30s
+    static_configs:
+      - targets:
+        - 'container-host-ip:9000'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: localhost:9115  # The promag exporter's real hostname:port
+```
