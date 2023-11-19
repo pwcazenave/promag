@@ -126,7 +126,7 @@ func parseAirGradientJSON(w http.ResponseWriter, r *http.Request, client *redis.
 	path := r.URL.Path
 	parts := strings.Split(path, "/")
 	// Use the ID as the prefix for the in-memory keys
-	deviceParts := strings.Split(parts[len(parts) - 1], ":")
+	deviceParts := strings.Split(parts[len(parts) - 2], ":")
 	deviceID := deviceParts[len(deviceParts) - 1]
 	log.Println("Device ID:", deviceID)
 	log.Println("URL Path:", path)
