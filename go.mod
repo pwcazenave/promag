@@ -1,4 +1,4 @@
-module promairgradient
+module promag
 
 go 1.21.1
 
