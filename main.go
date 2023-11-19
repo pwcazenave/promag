@@ -230,13 +230,13 @@ func (m *prometheusMetrics) probeHandler(w http.ResponseWriter, r *http.Request,
 	log.Println(fmt.Sprintf("Got Rhum for %s of %s", deviceID, Rhum))
 
 	if success == 1 {
-		iWifi, err := strconv.ParseFloat(strings.TrimSpace(Rco2), 64)
+		iWifi, err := strconv.ParseFloat(strings.TrimSpace(Wifi), 64)
 		if err != nil {
 			log.Fatal(err)
 			// panic(err)
 		}
 		m.WiFi.Set(iWifi)
-		iRco2, err := strconv.ParseFloat(strings.TrimSpace(Wifi), 64)
+		iRco2, err := strconv.ParseFloat(strings.TrimSpace(Rco2), 64)
 		if err != nil {
 			log.Fatal(err)
 			// panic(err)
@@ -281,12 +281,12 @@ func main() {
 	iredisPort, err := strconv.Atoi(redisPort)
 	if err != nil {
 		log.Fatal(err)
-		// panic(err)
+		panic(err)
 	}
 	iredisDB, err := strconv.Atoi(redisDB)
 	if err != nil {
 		log.Fatal(err)
-		// panic(err)
+		panic(err)
 	}
 
 	redisConnection := fmt.Sprintf("%s:%d", redisHost, iredisPort)
