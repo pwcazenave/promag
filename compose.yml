@@ -10,7 +10,7 @@ services:
       promag-network:
 
   promag:
-    image: registry.upended.duckdns.org/promag:latest
+    image: localhost/promag:latest
     container_name: promag
     hostname: promag
     restart: unless-stopped
