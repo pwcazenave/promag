@@ -17,22 +17,22 @@ import (
 )
 
 type AirGradient struct {
-/*
-	// Content of payload from the AirGradient firmware
-	String payload = "{\"wifi\":" + String(WiFi.RSSI())
-	+ (Co2 < 0 ? "" : ", \"rco2\":" + String(Co2))
-	+ (pm25 < 0 ? "" : ", \"pm02\":" + String(pm25))
-	+ ", \"atmp\":" + String(temp)
-	+ (hum < 0 ? "" : ", \"rhum\":" + String(hum))
-	+ "}";
-	// Yields JSON something like:
-	{
-		"wifi": -51,
-		"rco2": 517,
-		"pm02": 4,
-		"atmp": 15.5,
-		"rhum": 78
-	}
+	/*
+		// Content of payload from the AirGradient firmware
+		String payload = "{\"wifi\":" + String(WiFi.RSSI())
+		+ (Co2 < 0 ? "" : ", \"rco2\":" + String(Co2))
+		+ (pm25 < 0 ? "" : ", \"pm02\":" + String(pm25))
+		+ ", \"atmp\":" + String(temp)
+		+ (hum < 0 ? "" : ", \"rhum\":" + String(hum))
+		+ "}";
+		// Yields JSON something like:
+		{
+			"wifi": -51,
+			"rco2": 517,
+			"pm02": 4,
+			"atmp": 15.5,
+			"rhum": 78
+		}
 
 	*/
 	Wifi int     `json:"wifi"` // wifi signal strength (dB)
@@ -146,27 +146,27 @@ func parseAirGradientJSON(w http.ResponseWriter, r *http.Request, client *redis.
 	log.Println("rhum:", jsonBody.Rhum)
 	log.Println("")
 
-	log.Println(fmt.Sprintf("Setting Wifi for %s to %d", deviceID, jsonBody.Wifi))
+	log.Printf("Setting Wifi for %s to %d", deviceID, jsonBody.Wifi)
 	err = client.Set(ctx, fmt.Sprintf("%s_wifi", deviceID), jsonBody.Wifi, 0).Err()
 	if err != nil {
 		panic(err)
 	}
-	log.Println(fmt.Sprintf("Setting Rco2 for %s to %d", deviceID, jsonBody.Rco2))
+	log.Printf("Setting Rco2 for %s to %d\n", deviceID, jsonBody.Rco2)
 	err = client.Set(ctx, fmt.Sprintf("%s_rco2", deviceID), jsonBody.Rco2, 0).Err()
 	if err != nil {
 		panic(err)
 	}
-	log.Println(fmt.Sprintf("Setting Pm02 for %s to %d", deviceID, jsonBody.Pm02))
+	log.Printf("Setting Pm02 for %s to %d\n", deviceID, jsonBody.Pm02)
 	err = client.Set(ctx, fmt.Sprintf("%s_pm02", deviceID), jsonBody.Pm02, 0).Err()
 	if err != nil {
 		panic(err)
 	}
-	log.Println(fmt.Sprintf("Setting atmp for %s to %f", deviceID, jsonBody.Atmp))
+	log.Printf("Setting atmp for %s to %f\n", deviceID, jsonBody.Atmp)
 	err = client.Set(ctx, fmt.Sprintf("%s_atmp", deviceID), jsonBody.Atmp, 0).Err()
 	if err != nil {
 		panic(err)
 	}
-	log.Println(fmt.Sprintf("Setting rhum for %s to %d", deviceID, jsonBody.Rhum))
+	log.Printf("Setting rhum for %s to %d\n", deviceID, jsonBody.Rhum)
 	err = client.Set(ctx, fmt.Sprintf("%s_rhum", deviceID), jsonBody.Rhum, 0).Err()
 	if err != nil {
 		panic(err)
