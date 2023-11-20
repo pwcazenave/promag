@@ -190,6 +190,7 @@ func fetchFromRedis(key string, deviceID string, client *redis.Client, ctx conte
 		log.Fatal(err)
 		panic(err)
 	}
+
 	return value, success
 }
 
