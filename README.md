@@ -1,3 +1,19 @@
+- [AirGradient-Prometheus exporter](#airgradient-prometheus-exporter)
+- [Build](#build)
+  - [Docker](#docker)
+  - [Go binary](#go-binary)
+- [Run](#run)
+  - [Docker](#docker-1)
+    - [Compose](#compose)
+    - [Standalone](#standalone)
+  - [Standalone](#standalone-1)
+    - [Manually](#manually)
+    - [systemd](#systemd)
+- [Environment variables](#environment-variables)
+- [Prometheus](#prometheus)
+- [AirGradient sketch](#airgradient-sketch)
+- [Home Assistant](#home-assistant)
+
 # AirGradient-Prometheus exporter
 
 Server to receive POST requests from AirGradient and re-serve them as Prometheus metrics. Data are stored in redis from the AirGradient unit(s) and metrics can be accessed on a per-target basis if needed.
@@ -114,7 +130,7 @@ The `targets` should contain the unique `CHIP_ID`(s) of your AirGradient sensor(
 # AirGradient sketch
 In the AirGradient sketch ([`DIY_BASIC.ino`](https://github.com/airgradienthq/arduino/blob/master/examples/DIY_BASIC/DIY_BASIC.ino)), set the `APIROOT` to the location where this exporter is running (e.g. http://airgradient-exporter.local), then follow the instructions as per [the documentation](https://www.airgradient.com/open-airgradient/instructions/diy-v4/#software).
 
-# Home Assitant
+# Home Assistant
 There is an additional endpoint (`/json`) which returns the AirGradient data more or less as it came from the AirGradient sensor POST request:
 
 ```json
