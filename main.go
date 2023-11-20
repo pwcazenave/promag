@@ -107,7 +107,7 @@ func initCollectors(reg *prometheus.Registry) *prometheusMetrics {
 	m.Pm02 = prometheus.NewGauge(
 		prometheus.GaugeOpts{
 			Name: "airgradient_pm02",
-			Help: "2.0 ug particulate matter concentration (ug/m^3)",
+			Help: "2.5 ug particulate matter concentration (ug/m^3)",
 		},
 	)
 	reg.MustRegister(m.Pm02)
