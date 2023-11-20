@@ -52,7 +52,7 @@ docker compose -f compose.yml down
 ### Standalone
 
 ```bash
-docker run -dt docker.io/library/redis:latest --name redis
+docker run -dt docker.io/library/redis:latest --port 6379:6379 --name redis
 docker run -dt localhost/promag:latest --port 9000:9000 --name promag
 ```
 
