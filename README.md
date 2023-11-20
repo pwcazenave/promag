@@ -113,3 +113,27 @@ The `targets` should contain the unique `CHIP_ID`(s) of your AirGradient sensor(
 
 # AirGradient sketch
 In the AirGradient sketch ([`DIY_BASIC.ino`](https://github.com/airgradienthq/arduino/blob/master/examples/DIY_BASIC/DIY_BASIC.ino)), set the `APIROOT` to the location where this exporter is running (e.g. http://airgradient-exporter.local), then follow the instructions as per [the documentation](https://www.airgradient.com/open-airgradient/instructions/diy-v4/#software).
+
+# Home Assitant
+There is an additional endpoint (`/json`) which returns the AirGradient data more or less as it came from the AirGradient sensor POST request:
+
+```json
+{
+  "wifi": -59,
+  "rco2": 720,
+  "pm02": 2,
+  "atmp": 11.6,
+  "rhum": 78
+}
+```
+
+This can be used with a `rest` sensor in Home Assistant via `configuration.yml`:
+
+```yaml
+  - platform: rest
+    resource: https://airgradient-exporter.local/json?target=123456
+    name: Air Quality Sensor - CO2
+    scan_interval: 60
+    value_template: "{{ value_json.rco2 }}"
+    unit_of_measurement: "ppm"
+```
