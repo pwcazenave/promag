@@ -46,7 +46,7 @@ REDIS_HOST=my.redis.host.local REDIS_DB=1 ./promag
 ```
 
 ### systemd
-The following is a systemd unit to run `promag`:
+Copy the binary to `/usr/bin/promag`. Create the following systemd unit to run `promag` as `/etc/systemd/system/promag.service`:
 
 ```ini
 [Unit]
@@ -66,6 +66,19 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
+```
+
+Create a user:
+
+```
+groupadd promag
+useradd -g promag promag
+```
+
+Enable and run the systemd unit:
+
+```
+systemctl enable --now promag.service
 ```
 
 # Environment variables
