@@ -42,6 +42,15 @@ type AirGradient struct {
 	Rhum int     `json:"rhum"` // relative humidity (%)
 }
 
+type HomeAssistant struct {
+	// For Home Assistant, send float for everything
+	Wifi float64 `json:"wifi"` // wifi signal strength (dB)
+	Rco2 float64 `json:"rco2"` // CO2 (ppm)
+	Pm02 float64 `json:"pm02"` // 2.0um particulate matter (ug/m^3)
+	Atmp float64 `json:"atmp"` // atmospheric temperature (Celsius or Farenheit, user configured)
+	Rhum float64 `json:"rhum"` // relative humidity (%)
+}
+
 type prometheusMetrics struct {
 	probeDuration prometheus.Gauge
 	probeSuccess  prometheus.Gauge
@@ -173,6 +182,39 @@ func parseAirGradientJSON(w http.ResponseWriter, r *http.Request, client *redis.
 	}
 }
 
+func fetchFromRedis(key string, deviceID string, client *redis.Client, ctx context.Context) (string, float64) {
+	var success float64 = 1
+	value, err := client.Get(ctx, fmt.Sprintf("%s_%s", deviceID, key)).Result()
+	if err != nil {
+		success = 0
+		log.Fatal(err)
+		panic(err)
+	}
+	return value, success
+}
+
+func getData(deviceID string, client *redis.Client, ctx context.Context) (map[string]float64, float64) {
+	// Get all the data from redis and return as a map[name]{value}.
+	var success float64 = 1
+	keys := []string{"wifi", "rco2", "pm02", "atmp", "rhum"}
+	data := map[string]float64{}
+	for _, key := range keys {
+		log.Printf("Getting %s for %s\n", key, deviceID)
+		value, ok := fetchFromRedis(key, deviceID, client, ctx)
+		if ok != 1 {
+			success -= 1
+		}
+		valueFloat, err := strconv.ParseFloat(strings.TrimSpace(value), 64)
+		if err != nil {
+			log.Fatal(err)
+			panic(err)
+		}
+		data[key] = valueFloat
+	}
+
+	return data, success
+}
+
 func (m *prometheusMetrics) probeHandler(w http.ResponseWriter, r *http.Request, reg *prometheus.Registry, client *redis.Client, ctx context.Context) {
 	// Fetch the values from the redis for the sensor name (given as the target)
 	var success float64 = 1
@@ -185,82 +227,13 @@ func (m *prometheusMetrics) probeHandler(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	log.Println(fmt.Sprintf("Getting Wifi for %s", deviceID))
-	Wifi, err := client.Get(ctx, fmt.Sprintf("%s_wifi", deviceID)).Result()
-	if err != nil {
-		success = 0
-		log.Fatal(err)
-		// panic(err)
-	}
-	log.Println(fmt.Sprintf("Got Wifi for %s of %s", deviceID, Wifi))
-
-	log.Println(fmt.Sprintf("Getting Rco2 for %s", deviceID))
-	Rco2, err := client.Get(ctx, fmt.Sprintf("%s_rco2", deviceID)).Result()
-	if err != nil {
-		success = 0
-		log.Fatal(err)
-		// panic(err)
-	}
-	log.Println(fmt.Sprintf("Got Rco2 for %s of %s", deviceID, Rco2))
-
-	log.Println(fmt.Sprintf("Getting Pm02 for %s", deviceID))
-	Pm02, err := client.Get(ctx, fmt.Sprintf("%s_pm02", deviceID)).Result()
-	if err != nil {
-		success = 0
-		log.Fatal(err)
-		// panic(err)
-	}
-	log.Println(fmt.Sprintf("Got Pm02 for %s of %s", deviceID, Pm02))
-
-	log.Println(fmt.Sprintf("Getting Atmp for %s", deviceID))
-	Atmp, err := client.Get(ctx, fmt.Sprintf("%s_atmp", deviceID)).Result()
-	if err != nil {
-		success = 0
-		log.Fatal(err)
-		// panic(err)
-	}
-	log.Println(fmt.Sprintf("Got Atmp for %s of %s", deviceID, Atmp))
-
-	log.Println(fmt.Sprintf("Getting Rhum for %s", deviceID))
-	Rhum, err := client.Get(ctx, fmt.Sprintf("%s_rhum", deviceID)).Result()
-	if err != nil {
-		success = 0
-		log.Fatal(err)
-		// panic(err)
-	}
-	log.Println(fmt.Sprintf("Got Rhum for %s of %s", deviceID, Rhum))
-
+	data, success := getData(deviceID, client, ctx)
 	if success == 1 {
-		iWifi, err := strconv.ParseFloat(strings.TrimSpace(Wifi), 64)
-		if err != nil {
-			log.Fatal(err)
-			// panic(err)
-		}
-		m.WiFi.Set(iWifi)
-		iRco2, err := strconv.ParseFloat(strings.TrimSpace(Rco2), 64)
-		if err != nil {
-			log.Fatal(err)
-			// panic(err)
-		}
-		m.Rco2.Set(iRco2)
-		iPm02, err := strconv.ParseFloat(strings.TrimSpace(Pm02), 64)
-		if err != nil {
-			log.Fatal(err)
-			// panic(err)
-		}
-		m.Pm02.Set(iPm02)
-		iAtmp, err := strconv.ParseFloat(strings.TrimSpace(Atmp), 64)
-		if err != nil {
-			log.Fatal(err)
-			// panic(err)
-		}
-		m.Atmp.Set(iAtmp)
-		iRhum, err := strconv.ParseFloat(strings.TrimSpace(Rhum), 64)
-		if err != nil {
-			log.Fatal(err)
-			// panic(err)
-		}
-		m.Rhum.Set(iRhum)
+		m.WiFi.Set(data["wifi"])
+		m.Rco2.Set(data["rco2"])
+		m.Pm02.Set(data["pm02"])
+		m.Atmp.Set(data["atmp"])
+		m.Rhum.Set(data["rhum"])
 	}
 
 	duration := time.Since(start).Seconds()
@@ -269,6 +242,32 @@ func (m *prometheusMetrics) probeHandler(w http.ResponseWriter, r *http.Request,
 	h := promhttp.HandlerFor(reg, promhttp.HandlerOpts{Registry: reg})
 	h.ServeHTTP(w, r)
 
+}
+
+func sendJSON(w http.ResponseWriter, r *http.Request, client *redis.Client, ctx context.Context) {
+	// Fetch the data from redis and spit out a JSON object of that data
+	params := r.URL.Query()
+	deviceID := params.Get("target")
+	if deviceID == "" {
+		http.Error(w, "Target parameter missing or empty", http.StatusBadRequest)
+		return
+	}
+	data, success := getData(deviceID, client, ctx)
+
+	if success == 1 {
+		response := HomeAssistant{
+			Wifi: data["wifi"],
+			Rco2: data["rco2"],
+			Pm02: data["pm02"],
+			Atmp: data["atmp"],
+			Rhum: data["rhum"],
+		}
+		err := json.NewEncoder(w).Encode(response)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+	}
 }
 
 func main() {
@@ -307,6 +306,10 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/probe", func(w http.ResponseWriter, r *http.Request) {
 		metrics.probeHandler(w, r, registry, client, ctx)
+	})
+	// This just spits back the data in JSON format. I use this with Home Assistant
+	http.HandleFunc("/json", func(w http.ResponseWriter, r *http.Request) {
+		sendJSON(w, r, client, ctx)
 	})
 	// Listen on /sensors/ for the incoming AirGradient data. Use the sensor ID as the prefix for keys in redis.
 	http.HandleFunc("/sensors/", func(w http.ResponseWriter, r *http.Request) {
