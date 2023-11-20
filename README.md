@@ -58,7 +58,7 @@ After=network-online.target
 [Service]
 Type=simple
 # Uncomment if you wish to point promag at your redis host
-Environment="REDIS_HOST=my.redis.host.loca"
+Environment="REDIS_HOST=my.redis.host.local"
 User=promag
 Group=promag
 ExecStart=/usr/bin/promag
