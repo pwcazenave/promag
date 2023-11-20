@@ -5,12 +5,12 @@ Server to receive POST requests from AirGradient and re-serve them as Prometheus
 # Build
 
 ## Docker
-```
+```bash
 docker build -t localhost/promag:latest -f Containerfile
 ```
 
 ## Go binary
-```
+```bash
 go mod download
 go build -o promag .
 ```
@@ -20,19 +20,19 @@ go build -o promag .
 ### Compose
 This will set up redis and promag servers
 
-```
+```bash
 docker compose -f compose.yml up -d
 ```
 
 To stop:
 
-```
+```bash
 docker compose -f compose.yml down
 ```
 
 ### Standalone
 
-```
+```bash
 docker run -dt docker.io/library/redis:latest --name redis
 docker run -dt localhost/promag:latest --port 9000:9000 --name promag
 ```
@@ -41,7 +41,7 @@ docker run -dt localhost/promag:latest --port 9000:9000 --name promag
 ### Manually
 The binary expects a redis instance running on `localhost:6379` with no authentication. Use the environment variables `REDIS_HOST`, `REDIS_PASSWORD`, `REDIS_PORT` and `REDIS_DB` to adjust your configuration. For example:
 
-```
+```bash
 REDIS_HOST=my.redis.host.local REDIS_DB=1 ./promag
 ```
 
@@ -70,14 +70,14 @@ WantedBy=multi-user.target
 
 Create a user:
 
-```
+```bash
 groupadd promag
 useradd -g promag promag
 ```
 
 Enable and run the systemd unit:
 
-```
+```bash
 systemctl enable --now promag.service
 ```
 
