@@ -71,8 +71,7 @@ WantedBy=multi-user.target
 Create a user:
 
 ```bash
-groupadd promag
-useradd -g promag promag
+useradd --user-group -g promag promag
 ```
 
 Enable and run the systemd unit:
