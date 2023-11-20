@@ -15,13 +15,37 @@ go mod download
 go build -o promag .
 ```
 
+# Run
+## Docker
+### Compose
+This will set up redis and promag servers
+
+```
+docker compose -f compose.yml up -d
+```
+
+To stop:
+
+```
+docker compose -f compose.yml down
+```
+
+### Standalone
+
+```
+docker run -dt docker.io/library/redis:latest --name redis
+docker run -dt localhost/promag:latest --port 9000:9000 --name promag
+```
+
+## Standalone
+### Manually
 The binary expects a redis instance running on `localhost:6379` with no authentication. Use the environment variables `REDIS_HOST`, `REDIS_PASSWORD`, `REDIS_PORT` and `REDIS_DB` to adjust your configuration. For example:
 
 ```
 REDIS_HOST=my.redis.host.local REDIS_DB=1 ./promag
 ```
 
-### Systemd
+### systemd
 The following is a systemd unit to run `promag`:
 
 ```ini
@@ -44,28 +68,7 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-# Run
-## Compose
-This will set up redis and promag servers
-
-```
-docker compose -f compose.yml up -d
-```
-
-To stop:
-
-```
-docker compose -f compose.yml down
-```
-
-## Standalone
-
-```
-docker run -dt docker.io/library/redis:latest --name redis
-docker run -dt localhost/promag:latest --port 9000:9000 --name promag
-```
-
-## Environment variables for promag
+# Environment variables
 - `REDIS_HOST`: defaults to `localhost`
 - `REDIS_PASSWORD`: defaults to `""`
 - `REDIS_PORT`: defaults to `6379`
@@ -94,7 +97,7 @@ scrape_configs:
         replacement: 'airgradient-exporter.local'  # the DNS entry for the airgradient exporter
 ```
 
-The `targets` should contain the unique CHIP_ID(s) of your AirGradient sensor(s). This is the last six digits of the wireless access point that is created by the AirGradient firmware when it's being configured.
+The `targets` should contain the unique `CHIP_ID`(s) of your AirGradient sensor(s). This is the last six digits of the wireless access point that is created by the AirGradient firmware when it's being configured.
 
 # AirGradient sketch
 In the AirGradient sketch (`DIY_BASIC.ino`), set the `APIROOT` to the location where this exporter is running (e.g. http://airgradient-exporter.local), then follow the instructions as per [the documentation](https://www.airgradient.com/open-airgradient/instructions/diy-v4/#software).
