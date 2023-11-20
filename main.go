@@ -46,7 +46,7 @@ type HomeAssistant struct {
 	// For Home Assistant, send float for everything
 	Wifi float64 `json:"wifi"` // wifi signal strength (dB)
 	Rco2 float64 `json:"rco2"` // CO2 (ppm)
-	Pm02 float64 `json:"pm02"` // 2.0um particulate matter (ug/m^3)
+	Pm02 float64 `json:"pm02"` // 2.5um particulate matter (ug/m^3)
 	Atmp float64 `json:"atmp"` // atmospheric temperature (Celsius or Farenheit, user configured)
 	Rhum float64 `json:"rhum"` // relative humidity (%)
 }
