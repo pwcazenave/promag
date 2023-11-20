@@ -12,6 +12,7 @@
 - [Environment variables](#environment-variables)
 - [Prometheus](#prometheus)
 - [AirGradient sketch](#airgradient-sketch)
+- [Grafana](#grafana)
 - [Home Assistant](#home-assistant)
 
 # AirGradient-Prometheus exporter
@@ -131,6 +132,15 @@ The `targets` should contain the unique `CHIP_ID`(s) of your AirGradient sensor(
 
 # AirGradient sketch
 In the AirGradient sketch ([`DIY_BASIC.ino`](https://github.com/airgradienthq/arduino/blob/master/examples/DIY_BASIC/DIY_BASIC.ino)), set the `APIROOT` to the location where this exporter is running (e.g. http://airgradient-exporter.local), then follow the instructions as per [the documentation](https://www.airgradient.com/open-airgradient/instructions/diy-v4/#software).
+
+# Grafana
+Import the `grafana_dashboard.json` file into Grafana to visualise the AirGradient sensor CO2 and particulate data.
+
+* Log in as admin to your Grafana instance
+* Click the + in the corner
+* Select Import Dashboard
+* Paste the contents of `grafana_dashboard.json` into the box headed Import via dashboard JSON model
+* Click Load
 
 # Home Assistant
 There is an additional endpoint (`/json`) which returns the AirGradient data more or less as it came from the AirGradient sensor POST request:
