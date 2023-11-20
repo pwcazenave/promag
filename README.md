@@ -24,7 +24,7 @@ Optionally allows data to be ingested to Home Assistant via the `rest` sensor.
 
 ## Docker
 ```bash
-docker build -t localhost/promag:latest -f Containerfile
+docker build -t localhost/promag:latest -f Dockerfile
 ```
 
 ## Go binary
