@@ -18,6 +18,8 @@
 
 Server to receive POST requests from AirGradient and re-serve them as Prometheus metrics. Data are stored in redis from the AirGradient unit(s) and metrics can be accessed on a per-target basis if needed.
 
+Optionally allows data to be ingested to Home Assistant via the `rest` sensor.
+
 # Build
 
 ## Docker
