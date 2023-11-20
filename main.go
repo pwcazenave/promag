@@ -7,12 +7,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-    "strconv"
+	"strconv"
 	"strings"
 	"time"
-	"github.com/redis/go-redis/v9"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/redis/go-redis/v9"
 )
 
 type AirGradient struct {
@@ -33,7 +34,7 @@ type AirGradient struct {
 		"rhum": 78
 	}
 
-*/
+	*/
 	Wifi int     `json:"wifi"` // wifi signal strength (dB)
 	Rco2 int     `json:"rco2"` // CO2 (ppm)
 	Pm02 int     `json:"pm02"` // 2.0um particulate matter (ug/m^3)
@@ -52,11 +53,11 @@ type prometheusMetrics struct {
 }
 
 func getEnv(key, fallback string) string {
-    value, exists := os.LookupEnv(key)
-    if !exists {
-        value = fallback
-    }
-    return value
+	value, exists := os.LookupEnv(key)
+	if !exists {
+		value = fallback
+	}
+	return value
 }
 
 func initCollectors(reg *prometheus.Registry) *prometheusMetrics {
@@ -126,23 +127,23 @@ func parseAirGradientJSON(w http.ResponseWriter, r *http.Request, client *redis.
 	path := r.URL.Path
 	parts := strings.Split(path, "/")
 	// Use the ID as the prefix for the in-memory keys
-	deviceParts := strings.Split(parts[len(parts) - 2], ":")
-	deviceID := deviceParts[len(deviceParts) - 1]
+	deviceParts := strings.Split(parts[len(parts)-2], ":")
+	deviceID := deviceParts[len(deviceParts)-1]
 	log.Println("Device ID:", deviceID)
 	log.Println("URL Path:", path)
 	log.Println("URL Parts:", parts)
 	decoder := json.NewDecoder(r.Body)
 
 	var jsonBody AirGradient
-    err := decoder.Decode(&jsonBody)
-    if err != nil {
-        panic(err)
-    }
-    log.Println("wifi strength:", jsonBody.Wifi)
-    log.Println("rco2:", jsonBody.Rco2)
-    log.Println("pm02:", jsonBody.Pm02)
-    log.Println("atmp:", jsonBody.Atmp)
-    log.Println("rhum:", jsonBody.Rhum)
+	err := decoder.Decode(&jsonBody)
+	if err != nil {
+		panic(err)
+	}
+	log.Println("wifi strength:", jsonBody.Wifi)
+	log.Println("rco2:", jsonBody.Rco2)
+	log.Println("pm02:", jsonBody.Pm02)
+	log.Println("atmp:", jsonBody.Atmp)
+	log.Println("rhum:", jsonBody.Rhum)
 	log.Println("")
 
 	log.Println(fmt.Sprintf("Setting Wifi for %s to %d", deviceID, jsonBody.Wifi))
@@ -293,11 +294,11 @@ func main() {
 	log.Println("Connecting to redis on", redisConnection)
 
 	// Connect to redis to store the latest incoming AirGradient data
-    client := redis.NewClient(&redis.Options{
-        Addr:	  redisConnection,
-        Password: redisPassword,
-        DB:		  iredisDB,
-    })
+	client := redis.NewClient(&redis.Options{
+		Addr:     redisConnection,
+		Password: redisPassword,
+		DB:       iredisDB,
+	})
 	ctx := context.Background()
 
 	// Set up the prometheus end of things
