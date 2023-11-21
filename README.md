@@ -142,7 +142,7 @@ Import the `grafana_dashboard.json` file into Grafana to visualise the AirGradie
 * Paste the contents of `grafana_dashboard.json` into the box headed Import via dashboard JSON model
 * Click Load
 
-![grafana](https://github.com/pwcazenave/promag/assets/531784/a1d2999c-a542-4562-ac2d-ab26d0deb0f5)
+![image](https://github.com/pwcazenave/promag/assets/531784/e42c7447-0f80-4b72-aabd-2c17993a0bd7)
 
 # Home Assistant
 There is an additional endpoint (`/json`) which returns the AirGradient data more or less as it came from the AirGradient sensor POST request:
