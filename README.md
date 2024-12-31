@@ -131,7 +131,7 @@ scrape_configs:
 The `targets` should contain the unique `CHIP_ID`(s) of your AirGradient sensor(s). This is the last six digits of the wireless access point that is created by the AirGradient firmware when it's being configured.
 
 # AirGradient sketch
-In the AirGradient sketch ([`DIY_BASIC.ino`](https://github.com/airgradienthq/arduino/blob/d0e9d729a5affefab6b6b934f96547cd48005151/examples/DIY_BASIC/DIY_BASIC.ino)), set the `APIROOT` to the location where this exporter is running (e.g. http://airgradient-exporter.local), then follow the instructions as per [the documentation](https://www.airgradient.com/open-airgradient/instructions/diy-v4/#software).
+In the AirGradient sketch ([`BASIC.ino`](https://github.com/airgradienthq/arduino/blob/master/examples/BASIC/BASIC.ino)), set the `APIROOT` to the location where this exporter is running (e.g. http://airgradient-exporter.local), then follow the instructions as per [the documentation](https://www.airgradient.com/open-airgradient/instructions/diy-v4/#software).
 
 # Grafana
 Import the `grafana_dashboard.json` file into Grafana to visualise the AirGradient sensor CO2 and particulate data.
