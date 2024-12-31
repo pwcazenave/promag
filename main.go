@@ -44,11 +44,11 @@ type AirGradient struct {
 
 type HomeAssistant struct {
 	// For Home Assistant, send float for everything
-	Wifi float64 `json:"wifi"` // wifi signal strength (dB)
-	Rco2 float64 `json:"rco2"` // CO2 (ppm)
-	Pm02 float64 `json:"pm02"` // 2.5um particulate matter (ug/m^3)
-	Atmp float64 `json:"atmp"` // atmospheric temperature (Celsius or Farenheit, user configured)
-	Rhum float64 `json:"rhum"` // relative humidity (%)
+	Wifi *float64 `json:"wifi"` // wifi signal strength (dB)
+	Rco2 *float64 `json:"rco2"` // CO2 (ppm)
+	Pm02 *float64 `json:"pm02"` // 2.5um particulate matter (ug/m^3)
+	Atmp *float64 `json:"atmp"` // atmospheric temperature (Celsius or Farenheit, user configured)
+	Rhum *float64 `json:"rhum"` // relative humidity (%)
 }
 
 type prometheusMetrics struct {
@@ -59,6 +59,11 @@ type prometheusMetrics struct {
 	Pm02          prometheus.Gauge
 	Atmp          prometheus.Gauge
 	Rhum          prometheus.Gauge
+}
+
+// Helper function to convert float64 to *float64
+func Float64Ptr(v float64) *float64 {
+    return &v
 }
 
 func getEnv(key, fallback string) string {
@@ -257,11 +262,25 @@ func sendJSON(w http.ResponseWriter, r *http.Request, client *redis.Client, ctx 
 
 	if success == 1 {
 		response := HomeAssistant{
-			Wifi: data["wifi"],
-			Rco2: data["rco2"],
-			Pm02: data["pm02"],
-			Atmp: data["atmp"],
-			Rhum: data["rhum"],
+			Wifi: Float64Ptr(data["wifi"]),
+			Rco2: Float64Ptr(data["rco2"]),
+			Pm02: Float64Ptr(data["pm02"]),
+			Atmp: Float64Ptr(data["atmp"]),
+			Rhum: Float64Ptr(data["rhum"]),
+		}
+		err := json.NewEncoder(w).Encode(response)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+	} else {
+		// Send a JSON payload of nulls
+		response := HomeAssistant{
+			Wifi: nil,
+			Rco2: nil,
+			Pm02: nil,
+			Atmp: nil,
+			Rhum: nil,
 		}
 		err := json.NewEncoder(w).Encode(response)
 		if err != nil {
